@@ -2,7 +2,7 @@
 #include <TinyGPS++.h>      // The library for parsing GPS data
 #include <SoftwareSerial.h> // For creating a "virtual" serial port
 
-// --- 2. SETTINGS & GLOBAL VARIABLES ---
+// --- 2. SETTINGS & GLOBAL VARIABLES ---hgfmgdjdgcmhgdkm
 
 // What pins the GPS is connected to
 static const int RX_PIN = 4; // Arduino's RX pin (connects to GPS TX)
