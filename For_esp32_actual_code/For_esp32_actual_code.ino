@@ -10,8 +10,8 @@
 // ==========================================
 
 // 1. Wi-Fi Credentials
-const char* ssid = "iQOO Z9 5G"; 
-const char* password = "mounish5789";
+const char* ssid = "wifi - username "; 
+const char* password = "wifi - password ";
 
 // 2. Make.com Webhook URL
 String make_webhook_url = "https://hook.eu1.make.com/npg3ii363slduahhtpo3yhkmg03644r3"; 
