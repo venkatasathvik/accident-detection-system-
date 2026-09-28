@@ -1,0 +1,91 @@
+// --- 1. LIBRARIES ---
+// Now using the libraries for the ADXL345
+#include <Wire.h>
+#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_Sensor.h>
+
+// --- 2. SETTINGS & GLOBAL VARIABLES ---
+const float CRASH_THRESHOLD_G = 8.0; // The G-force to trigger an alert
+const int LED_PIN = 13; // The built-in LED on the Arduino Uno
+
+// Global Objects
+// Create an ADXL345 sensor object, giving it a unique ID
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+
+// State-keeping variable
+bool alertSent = false;
+
+
+void setup() {
+  // put your setup code here, to run once:
+  
+  Serial.begin(9600); // Start Serial for debugging
+  Serial.println("Accident Detection System Booting...");
+
+  // Set up the built-in LED
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  // Initialize the ADXL345 (Accelerometer)
+  if (!accel.begin()) {
+    Serial.println("Failed to find ADXL345 chip. Check wiring.");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("ADXL345 Found!");
+
+  // Set accelerometer range.
+  // Options: ADXL345_RANGE_2_G, ADXL345_RANGE_4_G, ADXL345_RANGE_8_G, ADXL345_RANGE_16_G
+  accel.setRange(ADXL345_RANGE_4_G);
+  Serial.println("Accelerometer range set to +-16G");
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  // Get new sensor event (this is slightly different from the MPU6050)
+  sensors_event_t event;
+  accel.getEvent(&event);
+
+  // Print acceleration values to the Serial Monitor
+  // These values are in m/s^2
+  Serial.print("X: "); Serial.print(event.acceleration.x);
+  Serial.print(" Y: "); Serial.print(event.acceleration.y);
+  Serial.print(" Z: "); Serial.print(event.acceleration.z);
+  Serial.println(" m/s^2");
+
+  // Calculate G-force
+  // 1 G = 9.81 m/s^2 (approx)
+  float x_g = event.acceleration.x / 9.81;
+  float y_g = event.acceleration.y / 9.81;
+  float z_g = event.acceleration.z / 9.81;
+
+  // Check if any axis has exceeded the G-force threshold
+  if ((abs(x_g) > CRASH_THRESHOLD_G || abs(y_g) > CRASH_THRESHOLD_G || abs(z_g) > CRASH_THRESHOLD_G) && !alertSent) {
+    
+    // --- CRASH DETECTED ---
+    Serial.println("---------------------------------");
+    Serial.println("CRASH DETECTED! G-Force spike recorded.");
+    Serial.println("---------------------------------");
+
+    // Set flag so we only send this alert ONCE
+    alertSent = true;
+    
+    // Flash the LED rapidly to show an alert
+    for(int i = 0; i < 20; i++) {
+      digitalWrite(LED_PIN, HIGH);
+      delay(100);
+      digitalWrite(LED_PIN, LOW);
+      delay(100);
+    }
+
+    Serial.println("Alert shown. System will reset in 10 seconds.");
+    
+    delay(10000); // Wait 10 seconds before re-arming
+    Serial.println("System re-armed.");
+    alertSent = false; // Re-arm the system
+  }
+
+  delay(100); // Check 10 times per second
+}

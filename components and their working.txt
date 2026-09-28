@@ -1,0 +1,23 @@
+The Prototype Method: Arduino + Sensors
+This method uses common, easy-to-use "off-the-shelf" modules. No heavy electronics design is needed; it's mostly wiring and programming.
+
+Core Components You'll Need:
+The "Brain": An Arduino Uno or Arduino Nano. This will run all the code.
+
+Impact Sensor: An MPU-6050 Accelerometer/Gyroscope. This sensor detects sudden, high G-force spikes—the signature of a crash.
+
+Location Sensor: A NEO-6M GPS Module. This will get the car's precise latitude and longitude.
+
+Alert System: A SIM800L or SIM900A GSM Module. This is a mini-phone that can send an SMS (text message). It requires its own active SIM card (like a prepaid one).
+
+Power: A 12V-to-5V car adapter (a standard USB car charger) and USB cables.
+
+How It Will Work (The Logic):
+The Arduino continuously reads data from the MPU-6050 accelerometer.
+
+Your code will check: "Is the G-force above a set threshold?" (e.g., a value that's much higher than a pothole, like a 5G+ impact).
+
+If the threshold is crossed (an accident is detected):
+ a. The Arduino immediately requests the current coordinates from the GPS module.
+ b. It then formats an SMS message, like: ACCIDENT DETECTED. Location: [latitude], [longitude].
+It commands the SIM800L GSM module to send this SMS to a pre-programmed phone number (for testing, this would be your own phone).
