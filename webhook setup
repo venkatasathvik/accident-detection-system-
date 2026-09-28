@@ -1,0 +1,31 @@
+Make.com Integration
+Automated Emergency Alerting via Make.com WebhooksThis module handles the automated alerting pipeline
+for the accident detection system. When the ESP32 detects an impact threshold via the ADXL345 accelerometer, 
+it packages the crash event data and NEO-6M GPS coordinates into a JSON payload.
+This payload is transmitted via an HTTP POST request to a dedicated Make.com webhook. 
+The Make.com scenario then parses the incoming telemetry and routes emergency notifications 
+(via Email, SMS, or Telegram) to predefined contacts, ensuring immediate alerting without
+requiring a dedicated backend server.Make.com Setup Guide1. Configure the Webhook TriggerCreate a new scenario in Make.com 
+and add the Webhooks module.Select Custom Webhook as the trigger.
+1. create a webhook in make.com and generate the weblink .
+
+2. Define the Data Structure (ESP32 JSON Payload)In the Make.com Webhook module, click Determine data structure.
+Your ESP32 needs to send an HTTP POST request to the webhook URL containing the sensor telemetry.
+Format the data as JSON so Make.com can map the variables cleanly:
+JSON{
+  "event": "collision_detected",
+  "impact_force_g": 4.5,
+  "latitude": 12.9716,
+  "longitude": 77.5946,
+  "google_maps_link": "https://maps.google.com/?q=12.9716,77.5946"
+}
+Send a single test request from your ESP32 or a tool like Postman. 
+Make.com will indicate "Successfully determined" once it reads the structure.
+3. Set Up the Action Module (Notification)Click the + button next to your webhook to add an action module. 
+Select a communication service like Gmail (Send an Email), Twilio (Create a Message),
+or Telegram.Map the parsed JSON variables directly into your message body. 
+For example, your alert message can be formatted as:
+CRITICAL ALER: Accident Detected!
+Impact Force: {{1.impact_force_g}} GsLocation Coordinates: {{1.latitude}}, 
+{{1.longitude}}View on Map: {{1.google_maps_link}}
+Save the scenario, toggle the scheduling switch at the bottom left to ON, and ensure it is set to run Immediately as data arrives.
